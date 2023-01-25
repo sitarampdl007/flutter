@@ -1,0 +1,26 @@
+image: devregistry.lenden.app/flutter-dev
+before_script:
+- export GRADLE_USER_HOME=$(pwd)/android/.gradle
+- chmod +x ./android/gradlew
+#- echo fs.inotify.max_user_watches=524288 | tee -a /etc/sysctl.conf && sysctl -p
+- export ANDROID_HOME=/opt/android_sdk
+- export PATH=$PATH:/opt/android_sdk/platform-tools/
+- export ANDROID_SDK_ROOT=/opt/android_sdk
+- export PATH=$PATH:/opt/flutter/bin
+- echo flutter.sdk=/opt/flutter > android/local.properties
+- flutter clean
+- flutter pub get
+stages:
+  - build
+build:
+  stage: build
+  script:
+    - cp .env.dev .env
+    - flutter build apk --release --no-shrink
+  artifacts:
+    paths:
+      - build/app/outputs/apk
+  tags:
+     - master
+  only:
+     - master
